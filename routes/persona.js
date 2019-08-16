@@ -56,6 +56,77 @@ app.get('/', (req, res, next) => {
 
 });
 
+// ==========================================
+// Paginar
+// ==========================================
+app.get('/paginar/:pagina', (req, res, next) => {
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    var pag = req.params.pagina || 0;
+
+
+
+
+    Persona.count({}, (err, conteo) => {
+
+        console.log('conteo:', conteo);
+        console.log('pag:', pag);
+
+
+        totalPagines = Math.ceil((conteo / 5));
+        console.log('totalPagines:', totalPagines);
+
+        if (pag > totalPagines) {
+            pag = totalPagines;
+        }
+        pag = pag - 1;
+        desde = pag * 5;
+
+        if (pag >= totalPagines - 1) {
+            pag_siguiente = 1;
+        } else {
+            pag_siguiente = pag + 2;
+        }
+        if (pag < 1) {
+            pag_anterior = totalPagines;
+        } else {
+            pag_anterior = pag;
+        }
+        Persona.find({
+                // $or: [{ "estat": 'vigent' }, { "estat": 'confirmada' }]
+                // 'estat': 'vigent'
+            })
+            .skip(desde)
+            .limit(10)
+            .exec((err, persones) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando reserves',
+                        errors: err
+                    });
+                }
+
+
+
+                res.status(200).json({
+                    ok: true,
+                    total: conteo,
+                    totalPagines: totalPagines,
+                    pag_actual: pag + 1,
+                    pag_siguiente: pag_siguiente,
+                    pag_anterior: pag_anterior,
+                    persones: persones
+                });
+
+            });
+
+    });
+});
+
+
 // ===================
 //Obtener totes les PErsoness
 // =========================
@@ -134,6 +205,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         persona.observacions = body.observacions;
         persona.email = body.email;
         persona.telefon = body.telefon;
+        persona.codiclient = body.codiclient;
 
 
         persona.save((err, personaGuardada) => {
@@ -234,7 +306,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         data_naixement: body.data_naixement,
         observacions: body.observacions,
         email: body.email,
-        telefon: body.telefon
+        telefon: body.telefon,
+        codiclient: body.codiclient
 
     });
     persona.save((err, personaGuardada) => {

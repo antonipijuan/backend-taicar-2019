@@ -7,7 +7,8 @@ var Schema = mongoose.Schema;
 var facturaSchema = new Schema({
     num: { type: Number, required: [true, 'El	nombre	es	necesario'] },
     data: { type: String, required: [true, 'El	data	es	necesario'] },
-    data_pagament: { type: String, required: [true, 'El	data	es	necesario'] },
+    data_vigencia: { type: String, required: [true, 'El	data	es	necesario'] },
+    data_pagament: { type: String, required: false },
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Persona',

@@ -7,6 +7,7 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 var app = express();
 
 var Booking = require('../models/booking');
+var Reserva = require('../models/reserva');
 
 // ==========================================
 // Obtener todos los bookings
@@ -128,6 +129,10 @@ app.get('/obtenirbookingperiode/:idvehicle/:datainici/:datafi/:disponible', mdAu
     Booking.find({
         $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
 
+    })
+
+    Reserva.find({
+        $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
     })
 
     .exec(

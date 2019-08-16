@@ -324,6 +324,104 @@ app.get('/pervehicle/:id_vehicle', (req, res) => {
 // ==========================================
 // ODespeses per vehicle
 // ==========================================
+app.get('/pertipologia/:id/:anualitat/:tipologia', (req, res) => {
+
+    var vehicle = req.params.id;
+    var anual = req.params.anualitat;
+    var tipus = req.params.tipologia;
+
+    var datafi = anual + '-12-32';
+    var datainici = anual + '-01-01';
+
+
+
+    Despesa.find({
+
+            $and: [{ data: { $lte: datafi } }, { data: { $gte: datainici } }, { "vehicle": vehicle }, { "tipus": tipus }]
+        })
+        // .populate('usuario', 'nombre email img')
+        // .populate('hospital')
+        .exec((err, despeses) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar despesa',
+                    errors: err
+                });
+            }
+
+            if (!despeses) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El vehicle con el id ' + id + ' no te despeses',
+                    errors: { message: 'No existe un vehicle con ese ID' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                despeses: despeses
+            });
+
+        });
+
+
+});
+
+// ==========================================
+// ODespeses per vehicle
+// ==========================================
+app.put('/pertipologiarray/:id/:anualitat', (req, res) => {
+
+    var vehicle = req.params.id;
+    var anual = req.params.anualitat;
+
+
+    var datafi = anual + '-12-32';
+    var datainici = anual + '-01-01';
+
+
+
+    Despesa.find({
+
+            $and: [{ data: { $lte: datafi } }, { data: { $gte: datainici } }, { "vehicle": vehicle }, { "tipus": tipus }]
+        })
+        // .populate('usuario', 'nombre email img')
+        // .populate('hospital')
+        .exec((err, despeses) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar despesa',
+                    errors: err
+                });
+            }
+
+            if (!despeses) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El vehicle con el id ' + id + ' no te despeses',
+                    errors: { message: 'No existe un vehicle con ese ID' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                despeses: despeses
+            });
+
+        });
+
+
+});
+
+
+
+// ==========================================
+// ODespeses per vehicle
+// ==========================================
 app.get('/despesespermes/:mes/:id_vehicle', (req, res) => {
 
     var vvehicle = req.params.id_vehicle;

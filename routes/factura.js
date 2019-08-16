@@ -17,36 +17,75 @@ var Factura = require('../models/factura');
 //Obtener totes les Factures
 // =========================
 
-app.get('/', (req, res, next) => {
+app.get('/:pagades', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var vpagades = req.params.pagades;
+
+
+
     desde = Number(desde);
 
-    Factura.find({})
+    if (vpagades == "true") {
+        console.log('primer if', vpagades);
+        Factura.find({
 
-    .populate('client')
-        .skip(desde)
-        // .limit()
-        .exec(
+        })
 
-            (err, factures) => {
-                if (err) {
-                    res.status(500).json({
-                        ok: false,
-                        mensaje: 'ERror cargando factura',
-                        errors: err
-                    });
-                }
+        .populate('client')
+            .skip(desde)
+            // .limit()
+            .exec(
 
-                Factura.count({}, (err, conteo) => {
+                (err, factures) => {
+                    if (err) {
+                        res.status(500).json({
+                            ok: false,
+                            mensaje: 'ERror cargando factura',
+                            errors: err
+                        });
+                    }
 
-                    res.status(200).json({
-                        ok: true,
-                        factures: factures,
-                        total: conteo
+                    Factura.count({}, (err, conteo) => {
+
+                        res.status(200).json({
+                            ok: true,
+                            factures: factures,
+                            total: conteo
+                        });
                     });
                 });
-            });
+    } else {
+        console.log('segon if', vpagades);
+        Factura.find({
+            'estat': { $ne: 'pagada' }
+        })
+
+        .populate('client')
+            .skip(desde)
+            // .limit()
+            .exec(
+
+                (err, factures) => {
+                    if (err) {
+                        res.status(500).json({
+                            ok: false,
+                            mensaje: 'ERror cargando factura',
+                            errors: err
+                        });
+                    }
+
+                    Factura.count({}, (err, conteo) => {
+
+                        res.status(200).json({
+                            ok: true,
+                            factures: factures,
+                            total: conteo
+                        });
+                    });
+                });
+    }
+
 });
 
 // ===================
@@ -109,7 +148,8 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         factura.num = body.num;
         factura.data = body.data;
-        factura.data_pagament = body.data_vigencia;
+        factura.data_vigencia = body.data_vigencia
+        factura.data_pagament = body.data_pagament;
         factura.client = body.client;
         factura.preu_brut = body.preu_brut;
         factura.preu_net = body.preu_net;
@@ -151,7 +191,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
     var factura = new Factura({
         num: body.num,
         data: body.data,
-        data_pagament: body.data,
+        data_vigencia: body.data_vigencia,
+        data_pagament: body.data_pagament,
         // viatgers: body.viatgers
         // vehicle: body.vehicle,
         client: body.client,
@@ -249,4 +290,59 @@ app.put('/actualitzaPagaments/:id', mdAutenticacion.verificaToken, (req, res) =>
 
 });
 
+
+// ===================
+// actualitza PAgaments
+// =========================
+app.get('/actualitzaEstat/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    var vid = req.params.id;
+    var vestat = req.params.estat;
+    // var vimport = req.params.import;
+    // var vimport = req.body.varimport;
+    // var vfactura = req.body.fact;
+    // vimport = Number(vimport);
+
+
+    Factura.findById(vid, (err, factura) => {
+
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'El factura no existe',
+                errors: err
+            });
+        }
+        if (!factura) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El factura con el id' + vid + ' no existe',
+                errors: { message: 'No existe factura con ese dni' }
+            });
+        }
+
+        factura.estat = vestat;
+
+        factura.save((err, facturaActualitzada) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'ERror al actualizar factura',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                factura: facturaActualitzada
+            });
+        });
+
+
+    });
+
+
+
+});
 module.exports = app;

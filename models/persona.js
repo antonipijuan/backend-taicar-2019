@@ -13,6 +13,7 @@ var personaSchema = new Schema({
     observacions: { type: String, required: false },
     email: { type: String, required: false },
     telefon: { type: String, required: false },
+    codiclient: { type: String, required: false },
 
 }, { collection: 'persones' });
 

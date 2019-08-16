@@ -19,8 +19,6 @@ app.get('/', (req, res, next) => {
             $or: [{ "estat": 'vigent' }, { "estat": 'confirmada' }, { "estat": 'facturada' }, ]
                 // 'estat': 'vigent'
         })
-        .skip(desde)
-        .limit(5)
         .populate('vehicle')
         .populate('pressupost')
         .exec(
@@ -186,6 +184,48 @@ app.get('/perpressupost/:num', (req, res) => {
                 ok: true,
                 reserves: reserves
             });
+        });
+});
+
+
+// ==========================================
+// Obtener booking entre dates
+// ==========================================
+app.get('/reservescoincidents/:idvehicle/:datainici/:datafi', mdAutenticacion.verificaToken, (req, res) => {
+
+    var idvehicle = req.params.idvehicle;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+    var vdisponible = req.params.disponible;
+
+    Reserva.find({
+        // $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
+        $and: [{ data_final: { $lte: fecha2 } }, { data_inicial: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+    })
+
+    .exec(
+        (err, reserves) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando bookings',
+                    errors: err
+                });
+            }
+            Reserva.count({
+                $and: [{ data_final: { $lte: fecha2 } }, { data_inicial: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+
+            }, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    reserves: reserves,
+                    total: conteo
+                });
+
+            });
+
         });
 });
 

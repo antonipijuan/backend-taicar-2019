@@ -42,6 +42,7 @@ var facturaRoutes = require('./routes/factura');
 var despesaRoutes = require('./routes/despesa');
 var facturadetallRoutes = require('./routes/facturadetall');
 var pagamentRoutes = require('./routes/pagament');
+var numeracioFactRoutes = require('./routes/numeraciofact');
 
 
 // Conexión a la base de datos
@@ -79,6 +80,7 @@ app.use('/factura', facturaRoutes);
 app.use('/despesa', despesaRoutes);
 app.use('/facturadetall', facturadetallRoutes);
 app.use('/pagament', pagamentRoutes);
+app.use('/numeraciofact', numeracioFactRoutes);
 
 
 app.use('/', appRoutes);
