@@ -129,7 +129,7 @@ app.get('/obtenirbookingperiode/:idvehicle/:datainici/:datafi/:disponible', mdAu
     Booking.find({
         $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
 
-    })
+    });
 
     Reserva.find({
         $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
@@ -290,6 +290,38 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
 });
 
+// ==========================================
+// Crear un nuevo booking
+// ==========================================
+app.post('/insertardatabooking/', mdAutenticacion.verificaToken, (req, res) => {
+
+    var body = req.body;
+
+    var booking = new Booking({
+        vehicle: body.vehicle,
+        data: body.data,
+        disponible: body.disponible
+    });
+
+    booking.save((err, bookingGuardado) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Error al crear booking',
+                errors: err
+            });
+        }
+
+        res.status(201).json({
+            ok: true,
+            booking: bookingGuardado
+        });
+
+
+    });
+
+});
 
 // ============================================
 //   Borrar un bookng por el id
@@ -487,6 +519,49 @@ app.put('/actualitzarbooking/:idvehicle/:data/:disponible', mdAutenticacion.veri
 // ==========================================
 // Actualizar una data bookings
 // ==========================================
+app.post('/post_actualitzarperiodebooking/:idvehicle/:datainici/:datafi', mdAutenticacion.verificaToken, (req, res) => {
+    var body = req.body;
+
+    var vehicle = req.params.idvehicle;
+    var datainici = req.params.datainici;
+    var vdatafi = req.params.datafi;
+    //var disponible = req.params.disponible;
+
+    let date_1 = moment(datainici);
+    let date_2 = moment(vdatafi);
+    var dates = [];
+
+    for (let _i = date_1; _i <= date_2; _i.add(1, 'days')) {
+        // dates.push(_i.format('YYYY-MM-DD'));
+        var booking = new Booking({
+            vehicle: vehicle,
+            data: _i.format('YYYY-MM-DD'),
+            disponible: false,
+            pressupost: body._id
+        });
+
+        booking.save((err, bookingGuardado) => {
+
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Error al crear booking',
+                    errors: err
+                });
+            }
+        });
+
+    }
+    res.status(201).json({
+        ok: true,
+        booking: 'Bookings guardats correctament'
+    });
+
+});
+
+// ==========================================
+// Actualizar una data bookings
+// ==========================================
 app.put('/put_actualitzarperiodebooking/:idvehicle/:datainici/:datafi/:disponible', mdAutenticacion.verificaToken, (req, res) => {
     var idvehicle = req.params.idvehicle;
     var fecha1 = req.params.datainici;
@@ -623,6 +698,57 @@ app.get('/actualitzarperpressupost/:idpressupost/:disponible', mdAutenticacion.v
                 "pressupost": ''
 
             }
+        },
+        (err, bookings) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error borrar medico',
+                    errors: err
+                });
+            }
+
+            if (!bookings) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe un booking con ese id',
+                    errors: { message: 'No existe un booking con ese id' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                booking: bookings
+            });
+
+        });
+
+
+});
+
+// ==========================================
+// Actualizar perpressupost
+// ==========================================
+app.delete('/esborrarperPressupost/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
+    var pressupost = req.params.idpressupost;
+    // var fecha1 = req.params.datainici;
+    // var fecha2 = req.params.datafi;
+    var vdisponible = req.params.disponible;
+
+    // var body = req.body;
+
+    // var pressupost = body._id;
+    // console.log(body);
+    // console.log(pressupost);
+
+
+    Booking.deleteMany({
+
+            "pressupost": pressupost
+                // data: { $lte: fecha2, $gte: fecha1 },
+                // "vehicle": idvehicle
+
+
         },
         (err, bookings) => {
             if (err) {

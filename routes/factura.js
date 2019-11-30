@@ -13,6 +13,45 @@ var Factura = require('../models/factura');
 
 //Rutas
 
+
+// ===================
+//Obtener totes les Factures
+// =========================
+
+app.get('/', (req, res, next) => {
+
+    /*   var desde = req.query.desde || 0;
+      var vpagades = req.params.pagades;
+
+
+
+      desde = Number(desde); */
+
+    Factura.find({})
+        .populate('client')
+        .exec(
+
+            (err, factures) => {
+                if (err) {
+                    res.status(500).json({
+                        ok: false,
+                        mensaje: 'ERror cargando factura',
+                        errors: err
+                    });
+                }
+
+                Factura.count({}, (err, conteo) => {
+
+                    res.status(200).json({
+                        ok: true,
+                        factures: factures,
+                        total: conteo
+                    });
+                });
+            });
+});
+
+
 // ===================
 //Obtener totes les Factures
 // =========================
@@ -91,7 +130,7 @@ app.get('/:pagades', (req, res, next) => {
 // ===================
 // Obtener factura porid
 // =========================
-app.get('/:id', (req, res) => {
+app.get('/consultaId/:id', (req, res) => {
 
     var id = req.params.id;
 
@@ -115,7 +154,7 @@ app.get('/:id', (req, res) => {
             }
             res.status(200).json({
                 ok: true,
-                factura: factura
+                factures: factura
             });
         });
 });
@@ -148,7 +187,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         factura.num = body.num;
         factura.data = body.data;
-        factura.data_vigencia = body.data_vigencia
+        factura.data_vigencia = body.data_vigencia;
         factura.data_pagament = body.data_pagament;
         factura.client = body.client;
         factura.preu_brut = body.preu_brut;
@@ -294,7 +333,7 @@ app.put('/actualitzaPagaments/:id', mdAutenticacion.verificaToken, (req, res) =>
 // ===================
 // actualitza PAgaments
 // =========================
-app.get('/actualitzaEstat/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/actualitzaEstat/:id/:estat', mdAutenticacion.verificaToken, (req, res) => {
 
     var vid = req.params.id;
     var vestat = req.params.estat;

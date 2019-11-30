@@ -373,6 +373,46 @@ app.get('/consultasireservaperdata2/:idvehicle/:data/:datafi', mdAutenticacion.v
 
 });
 
+// ==========================================
+// Obtener booking entre dates
+// ==========================================
+app.get('/obtenirbookingperiode/:idvehicle/:datainici/:datafi', mdAutenticacion.verificaToken, (req, res) => {
+
+    var idvehicle = req.params.idvehicle;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+
+
+    Reserva.find({
+        $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+    })
+
+    .exec(
+        (err, bookings) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando bookings',
+                    errors: err
+                });
+            }
+            Reserva.count({
+                $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+
+            }, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    bookings: bookings,
+                    total: conteo
+                });
+
+            });
+
+        });
+});
+
 app.get('/consultaperpressupost/:idpressupost', mdAutenticacion.verificaToken, (req, res) => {
 
     var idpressupost = req.params.idpressupost;

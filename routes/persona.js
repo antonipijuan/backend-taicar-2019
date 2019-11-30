@@ -29,8 +29,6 @@ app.get('/', (req, res, next) => {
     desde = Number(desde);
 
     Persona.find({})
-        .skip(desde)
-        .limit(10)
         .exec(
 
             (err, persones) => {
@@ -74,14 +72,15 @@ app.get('/paginar/:pagina', (req, res, next) => {
         console.log('pag:', pag);
 
 
-        totalPagines = Math.ceil((conteo / 5));
+        totalPagines = Math.ceil((conteo / 15));
+
         console.log('totalPagines:', totalPagines);
 
         if (pag > totalPagines) {
             pag = totalPagines;
         }
         pag = pag - 1;
-        desde = pag * 5;
+        desde = pag * 15;
 
         if (pag >= totalPagines - 1) {
             pag_siguiente = 1;
@@ -98,7 +97,7 @@ app.get('/paginar/:pagina', (req, res, next) => {
                 // 'estat': 'vigent'
             })
             .skip(desde)
-            .limit(10)
+            .limit(15)
             .exec((err, persones) => {
 
                 if (err) {
@@ -200,6 +199,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         persona.nombre = body.nombre;
         persona.dni = body.dni;
         persona.poblacio = body.poblacio;
+        persona.codipostal = body.codipostal;
         persona.data_naixement = body.data_naixement;
         persona.direccio = body.direccio;
         persona.observacions = body.observacions;
@@ -307,6 +307,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         observacions: body.observacions,
         email: body.email,
         telefon: body.telefon,
+        codipostal: body.codipostal,
         codiclient: body.codiclient
 
     });

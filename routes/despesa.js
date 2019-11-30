@@ -20,8 +20,6 @@ app.get('/', (req, res, next) => {
             // $or: [{ "estat": 'vigent' }, { "estat": 'confirmada' }]
             // 'estat': 'vigent'
         })
-        .skip(desde)
-        .limit(10)
         .populate('vehicle')
 
 
@@ -67,14 +65,16 @@ app.get('/paginar/:pagina', (req, res, next) => {
         console.log('pag:', pag);
 
 
-        totalPagines = Math.ceil((conteo / 5));
+        totalPagines = Math.ceil((conteo / 15));
+        console.log(conteo);
+        console.log(totalPagines);
         console.log('totalPagines:', totalPagines);
 
         if (pag > totalPagines) {
             pag = totalPagines;
         }
         pag = pag - 1;
-        desde = pag * 5;
+        desde = pag * 15;
 
         if (pag >= totalPagines - 1) {
             pag_siguiente = 1;
@@ -91,7 +91,7 @@ app.get('/paginar/:pagina', (req, res, next) => {
                 // 'estat': 'vigent'
             })
             .skip(desde)
-            .limit(5)
+            .limit(15)
             .populate('vehicle')
             .exec((err, despeses) => {
 
@@ -812,6 +812,43 @@ app.get('/despesespermes/:mes/:id_vehicle', (req, res) => {
 
 
     }
+});
+
+// ===================
+// Borrar pressupost
+// =========================
+app.delete('/pervehicle/:id_vehicle', mdAutenticacion.verificaToken, (req, res) => {
+
+    var id_vehicle = req.params.id_vehicle;
+
+    Despesa.deleteMany({
+        "vehicle": id_vehicle
+    })
+
+    .exec(
+        (err2, despeses_esborrades) => {
+
+            if (err2) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al borrar el despeses',
+                    errors: err
+                });
+            }
+            if (!despeses_esborrades) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No existe despeses con ese id de vehicle',
+                    errors: { message: 'No existe despesa con ese id de vehicle' }
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                despeses_esborrades: despeses_esborrades
+            });
+
+        });
 });
 
 module.exports = app;
