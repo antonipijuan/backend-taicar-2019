@@ -18,7 +18,7 @@
         "jsonwebtoken": "^8.1.0",
         "mixin-deep": "^2.0.1",
         "moment": "^2.22.2",
-        "mongoose": "^4.13.5",
+        "mongoose": "^5.7.5",
         "mongoose-unique-validator": "^1.0.6",
         "serve-index": "^1.9.1",
         "set-value": "^3.0.1"
