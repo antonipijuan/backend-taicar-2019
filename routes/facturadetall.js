@@ -361,6 +361,65 @@ app.get('/perfactura/:num', (req, res) => {
         });
 });
 
+// ===================
+// Obtener pressupostosdetall por num_pressupost
+// =========================
+app.get('/pervehicle/:id/:datainici/:datafi', (req, res) => {
+
+    var idvehicle = req.params.id;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+
+
+    FacturaDetall.aggregate([
+        // First Stage
+        /*         {
+                    $match: { "vehicle": idvehicle }
+                }, */
+        // Second Stage
+        {
+            //$match: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+            $match: { "data_inicial": { $gte: fecha1, $lt: fecha2 } }
+
+        },
+        {
+            $group: {
+                _id: "$vehicle",
+                facturesdetall: { $push: "$id_factura" },
+                totalSaleAmount: { $sum: "$preu" },
+                count: { $sum: 1 }
+            }
+        }
+    ])
+
+    /*     FacturaDetall.find({
+                'vehicle': idvehicle,
+            }) */
+    //.populate('vehicle')
+
+    .exec((err, facturesdetall) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar pressupost',
+                errors: err
+            });
+        }
+        if (!facturesdetall) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El pressupost con el id ' + id + ' no existe',
+                errors: { message: 'No existe un pressupost con ese id' }
+            });
+        }
+        res.status(200).json({
+            ok: true,
+            factures_detall: facturesdetall
+        });
+    });
+});
+
 
 
 

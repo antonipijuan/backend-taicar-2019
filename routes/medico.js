@@ -37,7 +37,7 @@ app.get('/', (req, res, next) => {
                         total: conteo
                     });
 
-                })
+                });
 
             });
 });
@@ -75,7 +75,7 @@ app.get('/:id', (req, res) => {
                 medico: medico
             });
 
-        })
+        });
 
 
 });

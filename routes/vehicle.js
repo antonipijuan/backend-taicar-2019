@@ -16,28 +16,28 @@ app.get('/', (req, res, next) => {
 
     Vehicle.find({})
         .skip(desde)
-        .limit(5)
-        .exec(
-            (err, vehicles) => {
 
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando vehiculo',
-                        errors: err
-                    });
-                }
+    .exec(
+        (err, vehicles) => {
 
-                Vehicle.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        vehicles: vehicles,
-                        total: conteo
-                    });
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando vehiculo',
+                    errors: err
+                });
+            }
 
+            Vehicle.count({}, (err, conteo) => {
+                res.status(200).json({
+                    ok: true,
+                    vehicles: vehicles,
+                    total: conteo
                 });
 
             });
+
+        });
 });
 
 // ==========================================

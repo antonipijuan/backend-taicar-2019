@@ -161,6 +161,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         pressupost.data_vigencia = body.data_vigencia;
         pressupost.client = body.client;
         pressupost.preu_brut = body.preu_brut;
+        pressupost.descompte = body.descompte;
         pressupost.preu_net = body.preu_net;
         pressupost.observacions = body.observacions;
         pressupost.estat = body.estat;
@@ -361,6 +362,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         // vehicle: body.vehicle,
         client: body.client,
         preu_brut: body.preu_brut,
+        descompte: body.descompte,
         preu_net: body.preu_net,
         observacions: body.observacions,
         estat: 'vigent'

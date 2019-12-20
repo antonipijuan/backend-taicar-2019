@@ -38,7 +38,7 @@ app.get('/', (req, res, next) => {
                         total: conteo
                     });
 
-                })
+                });
 
 
 

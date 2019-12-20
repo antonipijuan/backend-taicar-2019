@@ -14,6 +14,8 @@ var pressupostSchema = new Schema({
         required: [true, 'El id client esun campo obligatorio ']
     },
     preu_brut: { type: Number, required: false },
+    descompte: { type: Number, required: false },
+
     preu_net: { type: Number, required: false },
     observacions: { type: String, required: false },
     estat: { type: String, required: true }

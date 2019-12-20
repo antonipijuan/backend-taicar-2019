@@ -191,6 +191,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         factura.data_pagament = body.data_pagament;
         factura.client = body.client;
         factura.preu_brut = body.preu_brut;
+        factura.descompte = body.descompte;
         factura.preu_net = body.preu_net;
         factura.observacions = body.observacions;
         factura.estat = body.estat;
@@ -236,6 +237,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         // vehicle: body.vehicle,
         client: body.client,
         preu_brut: body.preu_brut,
+        descompte: body.descompte,
         preu_net: body.preu_net,
         observacions: body.observacions,
         estat: 'emesa',
@@ -299,6 +301,7 @@ app.put('/actualitzaPagaments/:id', mdAutenticacion.verificaToken, (req, res) =>
         factura.data_pagament = vfactura.data_pagament;
         factura.client = vfactura.client;
         factura.preu_brut = vfactura.preu_brut;
+        factura.descompte = vfactura.descompte;
         factura.preu_net = vfactura.preu_net;
         factura.observacions = vfactura.observacions;
         factura.estat = vfactura.estat;
@@ -383,5 +386,46 @@ app.put('/actualitzaEstat/:id/:estat', mdAutenticacion.verificaToken, (req, res)
 
 
 
+});
+
+// ==========================================
+// Obtener booking entre dates
+// ==========================================
+app.get('/llistatfacturespervehicles_entredates/:idvehicle/:datainici/:datafi', mdAutenticacion.verificaToken, (req, res) => {
+
+    var idvehicle = req.params.idvehicle;
+    var fecha1 = req.params.datainici;
+    var fecha2 = req.params.datafi;
+    var vdisponible = req.params.disponible;
+
+    Factura.find({
+        // $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }, { "disponible": vdisponible }]
+        $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+    })
+
+    .exec(
+        (err, factures) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando factures',
+                    errors: err
+                });
+            }
+            Factura.count({
+                $and: [{ data: { $lte: fecha2 } }, { data: { $gte: fecha1 } }, { "vehicle": idvehicle }]
+
+            }, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    factures: factures,
+                    total: conteo
+                });
+
+            });
+
+        });
 });
 module.exports = app;
